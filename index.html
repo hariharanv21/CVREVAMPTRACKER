@@ -2,11 +2,27 @@
 <html>
 <head>
   <title>Bug Tracker</title>
-  <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbxDE9sK-gv6F3pmnNempZY-vkHM_pzcBeOlAUXzrTya7Ixck7uFKZtFmmtOwjtCACMH/exec?action=getData">
 </head>
-<body>
-  <h2 style="text-align:center;margin-top:50px;">
-    Opening Bug Tracker...
-  </h2>
+<body style="font-family: Arial; padding:20px;">
+
+<h2>Bug Tracker</h2>
+<button onclick="loadBugs()">Load Bugs</button>
+
+<pre id="output"></pre>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxDE9sK-gv6F3pmnNempZY-vkHM_pzcBeOlAUXzrTya7Ixck7uFKZtFmmtOwjtCACMH/exec";
+
+function loadBugs() {
+  fetch(API_URL + "?action=getBugs")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("output").textContent =
+        JSON.stringify(data, null, 2);
+    })
+    .catch(err => alert(err));
+}
+</script>
+
 </body>
 </html>
