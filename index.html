@@ -5,22 +5,23 @@
 </head>
 <body style="font-family: Arial; padding:20px;">
 
-<h2>Bug Tracker</h2>
+<h2>CV Revamp Bug Tracker</h2>
+
 <button onclick="loadBugs()">Load Bugs</button>
 
-<pre id="output"></pre>
+<pre id="output" style="background:#f4f4f4;padding:10px;"></pre>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxDE9sK-gv6F3pmnNempZY-vkHM_pzcBeOlAUXzrTya7Ixck7uFKZtFmmtOwjtCACMH/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzwnjznVjc0xK0rYKcaH6eBNXXasR7E7hct4rOzYpaA8vuvEulOb35UOPDBrrXdT660/exec";
 
 function loadBugs() {
-  fetch(API_URL + "?action=getBugs")
+  fetch(API_URL)
     .then(res => res.json())
     .then(data => {
       document.getElementById("output").textContent =
         JSON.stringify(data, null, 2);
     })
-    .catch(err => alert(err));
+    .catch(err => alert("Error: " + err));
 }
 </script>
 
