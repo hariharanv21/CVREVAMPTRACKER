@@ -9,10 +9,10 @@
 
 <button onclick="loadBugs()">Load Bugs</button>
 
-<pre id="output" style="background:#f4f4f4;padding:10px;"></pre>
+<pre id="output"></pre>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzwnjznVjc0xK0rYKcaH6eBNXXasR7E7hct4rOzYpaA8vuvEulOb35UOPDBrrXdT660/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyxxGseC6is_0g3PN-aCeJyemUby_jBH5FYwx4XbGdXbkbHXlIUZ5osv8Rs0ZxOe3Us/exec";
 
 function loadBugs() {
   fetch(API_URL)
@@ -21,7 +21,7 @@ function loadBugs() {
       document.getElementById("output").textContent =
         JSON.stringify(data, null, 2);
     })
-    .catch(err => alert("Error: " + err));
+    .catch(err => alert(err));
 }
 </script>
 
