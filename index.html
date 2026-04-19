@@ -1,25 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bug Tracker</title>
+  <title>CV Revamp Bug Tracker</title>
+  <style>
+    body { font-family: Arial; padding:20px; }
+    table { border-collapse: collapse; width:100%; margin-top:20px; }
+    th, td { border:1px solid #ddd; padding:8px; }
+    th { background:#333; color:white; }
+    button { padding:8px 15px; margin-top:10px; }
+  </style>
 </head>
-<body style="font-family: Arial; padding:20px;">
+<body>
 
 <h2>CV Revamp Bug Tracker</h2>
 
 <button onclick="loadBugs()">Load Bugs</button>
 
-<pre id="output"></pre>
+<table id="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Type</th>
+      <th>Screen</th>
+      <th>Priority</th>
+      <th>Status</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyxxGseC6is_0g3PN-aCeJyemUby_jBH5FYwx4XbGdXbkbHXlIUZ5osv8Rs0ZxOe3Us/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx3MA8cg5dIWs_NbhEapMfdKTmDZHfVmK_pRFap7tu9or8MMbHfW0nHd-lfuimyR8HR/exec";
 
 function loadBugs() {
   fetch(API_URL)
     .then(res => res.json())
     .then(data => {
-      document.getElementById("output").textContent =
-        JSON.stringify(data, null, 2);
+      const tbody = document.querySelector("#table tbody");
+      tbody.innerHTML = "";
+
+      data.bugs.forEach(bug => {
+        const row = `<tr>
+          <td>${bug.id}</td>
+          <td>${bug.type}</td>
+          <td>${bug.screen}</td>
+          <td>${bug.priority}</td>
+          <td>${bug.status}</td>
+          <td>${bug.description}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
     })
     .catch(err => alert(err));
 }
