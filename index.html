@@ -426,18 +426,15 @@
       <div class="card hero-main">
         <div class="eyebrow"><span class="dot" id="liveDot"></span><span id="syncText">Connected to Google Apps Script</span></div>
         <h1>CV Revamp Bug Tracker</h1>
-        <p class="hero-copy">This frontend is now permanently wired to your live Apps Script backend. No setup screen, no pasted web-app URL, and no separate connection step for your team.</p>
+        <p class="hero-copy">Track product issues, assign ownership, follow status changes, and keep the whole CV Revamp team aligned in one clean workspace.</p>
         <div class="hero-actions">
           <button class="btn btn-primary" id="newBugBtn" type="button">Log New Bug</button>
           <button class="btn btn-secondary" id="refreshBtn" type="button">Refresh</button>
           <button class="btn btn-secondary" id="profileBtn" type="button">Set Display Name</button>
+          <button class="btn btn-secondary" id="exportBtn" type="button" style="display:none;">Export Report</button>
         </div>
       </div>
       <div class="card hero-side">
-        <div>
-          <div class="meta-label">Backend</div>
-          <div class="meta-value" id="backendUrl">Pinned to live Apps Script</div>
-        </div>
         <div>
           <div class="meta-label">You</div>
           <div class="meta-value" id="displayNameLabel">Anonymous</div>
@@ -583,11 +580,11 @@ let displayName = localStorage.getItem("cvbt_name") || "";
 let toastTimer = null;
 
 const el = {
-  backendUrl: document.getElementById("backendUrl"),
   displayNameLabel: document.getElementById("displayNameLabel"),
   roleButtons: document.getElementById("roleButtons"),
   syncText: document.getElementById("syncText"),
   liveDot: document.getElementById("liveDot"),
+  exportBtn: document.getElementById("exportBtn"),
   stats: document.getElementById("stats"),
   searchInput: document.getElementById("searchInput"),
   statusFilter: document.getElementById("statusFilter"),
@@ -718,11 +715,68 @@ function renderRoles() {
       renderSelectedBug();
     });
   });
+
+  el.exportBtn.style.display = currentRole === "Project Manager" ? "inline-flex" : "none";
 }
 
 function renderMeta() {
-  el.backendUrl.textContent = SCRIPT_URL;
   el.displayNameLabel.textContent = displayName || "Anonymous";
+}
+
+function exportReport() {
+  if (currentRole !== "Project Manager") {
+    showToast("Only PM can export bug reports.");
+    return;
+  }
+
+  const headers = [
+    "ID",
+    "Type",
+    "Priority",
+    "Status",
+    "Screen",
+    "Description",
+    "Reporter",
+    "Assignee",
+    "Steps",
+    "Expected",
+    "Actual",
+    "Created At",
+    "Fixed At",
+    "Time Taken",
+    "Remarks"
+  ];
+
+  const rows = bugs.map((bug) => [
+    bug.id || "",
+    bug.type || "",
+    bug.priority || "",
+    bug.status || "",
+    bug.screen || "",
+    bug.description || "",
+    bug.reporter || "",
+    bug.assignee || "",
+    bug.steps || "",
+    bug.expected || "",
+    bug.actual || "",
+    fmtDate(bug.createdAt),
+    fmtDate(bug.fixedAt),
+    bug.fixedAt ? elapsed(bug.createdAt, bug.fixedAt) : "Ongoing",
+    (bug.remarks || []).map((remark) => `${remark.by || "Unknown"} (${fmtDate(remark.at)}): ${remark.text || ""}`).join(" | ")
+  ]);
+
+  const csv = [headers, ...rows]
+    .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, "\"\"")}"`).join(","))
+    .join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `cv-revamp-bug-report-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+  showToast("Bug report exported.");
 }
 
 function renderStats() {
@@ -1050,6 +1104,7 @@ function setDisplayName() {
 document.getElementById("newBugBtn").addEventListener("click", () => openForm());
 document.getElementById("refreshBtn").addEventListener("click", () => loadBugs());
 document.getElementById("profileBtn").addEventListener("click", () => setDisplayName());
+document.getElementById("exportBtn").addEventListener("click", () => exportReport());
 document.getElementById("closeModalBtn").addEventListener("click", () => closeForm());
 el.modalBackdrop.addEventListener("click", (event) => {
   if (event.target === el.modalBackdrop) closeForm();
